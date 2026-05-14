@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Think&Draw</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/konva@9/konva.min.js"></script>
+
+    <!-- Mermaid -->
+    <script type="module">
+
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+        window.mermaid = mermaid;
+
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            securityLevel: 'loose'
+        });
+
+    </script>
+
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+
+        <h2>Diagram Tools</h2>
+
+        <div class="toolbox">
+
+            <div class="tool" id="rectBtn">
+                <div class="rect-icon"></div>
+                <span>Rectangle</span>
+            </div>
+
+            <div class="tool" id="circleBtn">
+                <div class="circle-icon"></div>
+                <span>Circle</span>
+            </div>
+
+            <div class="tool" id="textBtn">
+                <div class="text-icon">T</div>
+                <span>Text</span>
+            </div>
+
+            <div class="tool" id="arrowBtn">
+                <div class="arrow-icon">→</div>
+                <span>Arrow</span>
+            </div>
+
+        </div>
+
+        <hr>
+
+        <button id="selectBtn">Select Tool</button>
+        <button id="deleteBtn">Delete</button>
+
+        <hr>
+
+        <p><input type="color" id="colorPicker" /> change color</p>
+
+        <hr>
+
+        <h3>UML Code</h3>
+
+        <textarea id="umlInput">
+flowchart TD
+A[Start] --> B{Decision}
+B -->|Yes| C[Done]
+B -->|No| D[Retry]
+</textarea>
+
+        <button id="renderBtn">Render UML</button>
+
+    </div>
+
+    <!-- MAIN -->
+    <div id="main">
+
+        <div id="toolbar">
+            <button id="saveBtn">Save</button>
+            <button id="loadBtn">Load</button>
+            <button id="clearBtn">Clear</button>
+
+            <button id="zoomIn">+</button>
+            <button id="zoomOut">-</button>
+        </div>
+
+        <div id="container"></div>
+
+    </div>
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>
