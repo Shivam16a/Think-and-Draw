@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="./think&draw.svg" type="image/x-icon">
     <title>Think&Draw</title>
 
     <link rel="stylesheet" href="style.css">
@@ -29,9 +30,21 @@
 
 <body>
 
+    <div id="mobile-block">
+        <div class="box">
+
+            <div class="icon">📵</div>
+
+            <h1>Think&Draw</h1>
+            <p>This website cannot be used on mobile devices.</p>
+            <p>Please open it on a tablet, laptop, or desktop computer.</p>
+        </div>
+    </div>
+
     <!-- SIDEBAR -->
     <div id="sidebar">
-
+        <h1 style="display: flex; align-items: center; gap: 4px; padding: 5px;"><img src="./think&draw.svg" alt="logo"
+                width="40"> Think&Draw</h1>
         <h2>Diagram Tools</h2>
 
         <div class="toolbox">
@@ -72,13 +85,21 @@
         <h3>UML Code</h3>
 
         <textarea id="umlInput">
-flowchart TD
-A[Start] --> B{Decision}
-B -->|Yes| C[Done]
-B -->|No| D[Retry]
-</textarea>
+    flowchart TD
+    A[Start] --> B{Decision}
+    B -->|Yes| C[Done]
+    B -->|No| D[Retry]
+    </textarea>
 
         <button id="renderBtn">Render UML</button>
+
+        <hr>
+        <h3>Use Demo Mermaid UML code</h3>
+        <hr>
+        
+        <div class="codebox">
+            
+        </div>
 
     </div>
 
@@ -86,19 +107,23 @@ B -->|No| D[Retry]
     <div id="main">
 
         <div id="toolbar">
+            <div id="toolbar-left">
+                <button id="sidebarToggle">☰</button>
+            </div>
+            <div id="toolbar-right">
+                <button id="downloadPngBtn">Download PNG</button>
 
-            <button id="downloadPngBtn">Download PNG</button>
+                <button id="downloadJsonBtn">Export Project</button>
 
-            <button id="downloadJsonBtn">Export Project</button>
+                <input type="file" id="importJson" hidden />
 
-            <input type="file" id="importJson" hidden />
+                <button id="importBtn">Import Project</button>
 
-            <button id="importBtn">Import Project</button>
+                <button id="clearBtn">Clear</button>
 
-            <button id="clearBtn">Clear</button>
-
-            <button id="zoomIn">+</button>
-            <button id="zoomOut">-</button>
+                <button id="zoomIn">+</button>
+                <button id="zoomOut">-</button>
+            </div>
 
         </div>
 

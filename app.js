@@ -3,8 +3,8 @@
 // ======================
 const stage = new Konva.Stage({
     container: 'container',
-    width: window.innerWidth - 300,
-    height: window.innerHeight - 50,
+    width: document.getElementById('container').clientWidth,
+    height: document.getElementById('container').clientHeight,
     draggable: true
 });
 
@@ -195,9 +195,7 @@ document.getElementById('downloadPngBtn').onclick = async () => {
 };
 
 
-// ======================
-// EXPORT PROJECT (JSON)
-// ======================
+
 // ======================
 // EXPORT PROJECT (JSON)
 // ======================
@@ -238,6 +236,7 @@ document.getElementById('downloadJsonBtn').onclick = () => {
     URL.revokeObjectURL(url);
 
 };
+
 
 
 // ======================
@@ -548,3 +547,26 @@ document.getElementById('renderBtn').onclick = async () => {
         alert("Invalid UML");
     }
 };
+
+// =================
+// resize continer
+// =================
+
+window.addEventListener("resize", () => {
+    const container = document.getElementById("container");
+
+    stage.width(container.clientWidth);
+    stage.height(container.clientHeight);
+
+    stage.draw();
+});
+
+// ================
+// toggle button 
+// ================
+const sidebar = document.getElementById("sidebar");
+const toggleBtn = document.getElementById("sidebarToggle");
+
+toggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("hide");
+});
