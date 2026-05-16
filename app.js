@@ -151,29 +151,171 @@ document.getElementById('zoomOut').onclick = () => {
 };
 
 // ======================
-// SAVE / LOAD
+// DOWNLOAD PNG
 // ======================
-document.getElementById('saveBtn').onclick = () => {
-    localStorage.setItem("diagram", stage.toJSON());
-    alert("Saved");
+document.getElementById('downloadPngBtn').onclick = async () => {
+
+    try {
+
+        layer.draw();
+
+        const dataURL = stage.toDataURL({
+            pixelRatio: 2
+        });
+
+        const blob = await (await fetch(dataURL)).blob();
+
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'diagram.png';
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(url);
+
+    } catch (err) {
+
+        console.error(err);
+        alert("Export failed (canvas tainted)");
+
+    }
 };
 
-document.getElementById('loadBtn').onclick = () => {
-    const data = localStorage.getItem("diagram");
-    if (!data) return alert("No data");
-
-    const newStage = Konva.Node.create(data, 'container');
-    newStage.draw();
-};
 
 // ======================
-// CLEAR
+// EXPORT PROJECT (JSON)
+// ======================
+document.getElementById('downloadJsonBtn').onclick = () => {
+
+    // convert stage to JSON
+    const json = stage.toJSON();
+
+    // create downloadable file
+    const blob = new Blob([json], {
+        type: 'application/json'
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = 'diagram.json';
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+};
+
+
+// ======================
+// IMPORT BUTTON
+// ======================
+document.getElementById('importBtn').onclick = () => {
+
+    document.getElementById('importJson').click();
+
+};
+
+
+// ======================
+// IMPORT JSON PROJECT
+// ======================
+document.getElementById('importJson').onchange = (e) => {
+
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+
+        const json = event.target.result;
+
+        try {
+
+            // clear old
+            layer.destroyChildren();
+            layer.add(tr);
+
+            // load nodes into SAME stage
+            Konva.Node.create(json, stage);
+
+            stage.draw();
+
+            alert("Imported");
+
+        } catch (err) {
+            console.error(err);
+            alert("Invalid file");
+        }
+    };
+
+    reader.readAsText(file);
+};
+
+
+// ======================
+// CLEAR CANVAS
 // ======================
 document.getElementById('clearBtn').onclick = () => {
+
+    const confirmClear = confirm("Clear canvas?");
+
+    if (!confirmClear) return;
+
     layer.destroyChildren();
+
+    // re-add transformer
     layer.add(tr);
+
+    tr.nodes([]);
+
+    selectedShape = null;
+
     layer.draw();
+
 };
+
+
+// ======================
+// OPTIONAL:
+// KEYBOARD SHORTCUTS
+// ======================
+window.addEventListener('keydown', (e) => {
+
+    // CTRL + S = Export JSON
+    if (e.ctrlKey && e.key === 's') {
+
+        e.preventDefault();
+
+        document.getElementById('downloadJsonBtn').click();
+    }
+
+    // DELETE KEY
+    if (e.key === 'Delete') {
+
+        if (selectedShape) {
+
+            selectedShape.destroy();
+
+            tr.nodes([]);
+
+            selectedShape = null;
+
+            layer.draw();
+        }
+    }
+
+});
 
 // ======================
 // UML RENDER (ADD TO CANVAS)
@@ -192,8 +334,10 @@ document.getElementById('renderBtn').onclick = async () => {
 
         const svg = result.svg;
 
-        const blob = new Blob([svg], { type: 'image/svg+xml' });
-        const url = URL.createObjectURL(blob);
+        // ✅ SAFE: convert SVG to data URI (NOT blob URL)
+        const svgDataUrl =
+            'data:image/svg+xml;charset=utf-8,' +
+            encodeURIComponent(svg);
 
         const img = new Image();
 
@@ -209,15 +353,16 @@ document.getElementById('renderBtn').onclick = async () => {
             });
 
             addShape(shape);
-
-            URL.revokeObjectURL(url);
         };
 
-        img.src = url;
+        img.onerror = () => {
+            alert("Failed to load UML image");
+        };
+
+        img.src = svgDataUrl;
 
     } catch (err) {
+        console.error(err);
         alert("Invalid UML");
-        console.log(err);
     }
-
 };
