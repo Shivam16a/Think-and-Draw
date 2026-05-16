@@ -570,3 +570,20 @@ const toggleBtn = document.getElementById("sidebarToggle");
 toggleBtn.addEventListener("click", () => {
     sidebar.classList.toggle("hide");
 });
+
+// =================
+// copy button code
+// =================
+function copyCode(el) {
+    const code = el.closest(".code-item").querySelector("code").innerText;
+
+    navigator.clipboard.writeText(code).then(() => {
+        const msg = el.parentElement.querySelector(".copied-msg");
+
+        msg.classList.add("show");
+
+        setTimeout(() => {
+            msg.classList.remove("show");
+        }, 1200);
+    });
+}

@@ -45,7 +45,7 @@
     <div id="sidebar">
         <h1 style="display: flex; align-items: center; gap: 4px; padding: 5px;"><img src="./think&draw.svg" alt="logo"
                 width="40"> Think&Draw</h1>
-        <h2>Diagram Tools</h2>
+        <h3>Diagram Tools</h3>
 
         <div class="toolbox">
 
@@ -96,9 +96,74 @@
         <hr>
         <h3>Use Demo Mermaid UML code</h3>
         <hr>
-        
+
         <div class="codebox">
-            
+
+            <div class="code-item">
+                <div class="code-header">
+                    <h4>Flowchart</h4>
+
+                    <div class="copy-wrap">
+                        <span class="copy-icon" onclick="copyCode(this)">📋</span>
+                        <span class="copied-msg">Copied!</span>
+                    </div>
+                </div>
+                <pre><code class="mermaid-code">flowchart TD
+        A[Start] --> B{Decision}
+        B -->|Yes| C[Done]
+        B -->|No| D[Retry]</code></pre>
+            </div>
+
+            <div class="code-item">
+                <div class="code-header">
+                    <h4>Sequence Diagram</h4>
+
+                    <div class="copy-wrap">
+                        <span class="copy-icon" onclick="copyCode(this)">📋</span>
+                        <span class="copied-msg">Copied!</span>
+                    </div>
+                </div>
+                <pre><code class="mermaid-code">sequenceDiagram
+        User->>System: Login Request
+        System->>DB: Check Credentials
+        DB-->>System: OK
+        System-->>User: Login Success</code></pre>
+            </div>
+
+            <div class="code-item">
+                <div class="code-header">
+                    <h4>Class Diagram</h4>
+
+                    <div class="copy-wrap">
+                        <span class="copy-icon" onclick="copyCode(this)">📋</span>
+                        <span class="copied-msg">Copied!</span>
+                    </div>
+                </div>
+                <pre><code class="mermaid-code">classDiagram
+        class Animal {
+          +String name
+          +eat()
+        }
+        class Dog {
+          +bark()
+        }
+        Animal <|-- Dog</code></pre>
+            </div>
+
+            <div class="code-item">
+                <div class="code-header">
+                    <h4>ER Diagram</h4>
+
+                    <div class="copy-wrap">
+                        <span class="copy-icon" onclick="copyCode(this)">📋</span>
+                        <span class="copied-msg">Copied!</span>
+                    </div>
+                </div>
+                <pre><code class="mermaid-code">erDiagram
+        USER ||--o{ ORDER : places
+        ORDER ||--|{ PRODUCT : contains</code></pre>
+            </div>
+
         </div>
 
     </div>
