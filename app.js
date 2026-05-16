@@ -27,16 +27,25 @@ layer.add(tr);
 // SHAPE CREATION
 // ======================
 function addShape(shape) {
+
     layer.add(shape);
-    layer.draw();
 
     shape.on('click', () => {
+
         if (mode !== "select") return;
 
         selectedShape = shape;
+
         tr.nodes([shape]);
-        layer.draw();
+
+        layer.batchDraw();
+
     });
+
+    layer.batchDraw();
+
+    console.log(stage.toJSON()); // DEBUG
+
 }
 
 // ======================
@@ -189,15 +198,29 @@ document.getElementById('downloadPngBtn').onclick = async () => {
 // ======================
 // EXPORT PROJECT (JSON)
 // ======================
+// ======================
+// EXPORT PROJECT (JSON)
+// ======================
 document.getElementById('downloadJsonBtn').onclick = () => {
 
-    // convert stage to JSON
-    const json = stage.toJSON();
+    // save full project
+    const projectData = {
 
-    // create downloadable file
-    const blob = new Blob([json], {
-        type: 'application/json'
-    });
+        // canvas data
+        stage: stage.toJSON(),
+
+        // uml code
+        umlCode: document.getElementById('umlInput').value
+
+    };
+
+    // create file
+    const blob = new Blob(
+        [JSON.stringify(projectData)],
+        {
+            type: 'application/json'
+        }
+    );
 
     const url = URL.createObjectURL(blob);
 
@@ -213,6 +236,7 @@ document.getElementById('downloadJsonBtn').onclick = () => {
     document.body.removeChild(link);
 
     URL.revokeObjectURL(url);
+
 };
 
 
@@ -232,34 +256,192 @@ document.getElementById('importBtn').onclick = () => {
 document.getElementById('importJson').onchange = (e) => {
 
     const file = e.target.files[0];
+
     if (!file) return;
 
     const reader = new FileReader();
 
-    reader.onload = (event) => {
-
-        const json = event.target.result;
+    reader.onload = async (event) => {
 
         try {
 
-            // clear old
+            // parse saved project
+            const project = JSON.parse(event.target.result);
+
+            // parse stage json
+            const stageData = JSON.parse(project.stage);
+
+            // restore uml textarea
+            document.getElementById('umlInput').value =
+                project.umlCode || "";
+
+            // ======================
+            // RESTORE UML DIAGRAM
+            // ======================
+
+            if (project.umlCode && project.umlCode.trim() !== "") {
+
+                const id = "imported_" + Date.now();
+
+                const result = await mermaid.render(id, project.umlCode);
+
+                const svg = result.svg;
+
+                const svgDataUrl =
+                    'data:image/svg+xml;charset=utf-8,' +
+                    encodeURIComponent(svg);
+
+                const img = new Image();
+
+                img.onload = function () {
+
+                    const umlShape = new Konva.Image({
+
+                        x: 100,
+                        y: 100,
+
+                        image: img,
+
+                        draggable: true,
+
+                        scaleX: 0.8,
+                        scaleY: 0.8
+
+                    });
+
+                    // selection restore
+                    umlShape.on('click', () => {
+
+                        if (mode !== "select") return;
+
+                        selectedShape = umlShape;
+
+                        tr.nodes([umlShape]);
+
+                        layer.draw();
+
+                    });
+
+                    layer.add(umlShape);
+
+                    layer.draw();
+
+                };
+
+                img.src = svgDataUrl;
+
+            }
+
+            // clear current layer
             layer.destroyChildren();
+
+            // re-add transformer
             layer.add(tr);
 
-            // load nodes into SAME stage
-            Konva.Node.create(json, stage);
+            // get saved nodes
+            const children = stageData.children[0].children;
 
-            stage.draw();
+            // rebuild shapes
+            children.forEach(node => {
 
-            alert("Imported");
+                // skip transformer
+                if (node.className === "Transformer") return;
+
+                let shape = null;
+
+                // RECT
+                if (node.className === "Rect") {
+
+                    shape = new Konva.Rect(node.attrs);
+
+                }
+
+                // CIRCLE
+                else if (node.className === "Circle") {
+
+                    shape = new Konva.Circle(node.attrs);
+
+                }
+
+                // TEXT
+                else if (node.className === "Text") {
+
+                    shape = new Konva.Text(node.attrs);
+
+                    // restore dblclick edit
+                    shape.on('dblclick', () => {
+
+                        const val = prompt("Enter text");
+
+                        if (val) {
+
+                            shape.text(val);
+
+                            layer.draw();
+
+                        }
+
+                    });
+
+                }
+
+                // ARROW
+                else if (node.className === "Arrow") {
+
+                    shape = new Konva.Arrow(node.attrs);
+
+                }
+
+                // IMAGE (skip)
+                else if (node.className === "Image") {
+
+                    return;
+
+                }
+
+                // invalid shape
+                if (!shape) return;
+
+                // restore selection
+                shape.on('click', () => {
+
+                    if (mode !== "select") return;
+
+                    selectedShape = shape;
+
+                    tr.nodes([shape]);
+
+                    layer.draw();
+
+                });
+
+                // add shape
+                layer.add(shape);
+
+            });
+
+            // reset transformer
+            tr.nodes([]);
+
+            selectedShape = null;
+
+            // redraw
+            layer.draw();
+
+            alert("Imported Successfully");
 
         } catch (err) {
+
             console.error(err);
-            alert("Invalid file");
+
+            alert("Invalid JSON File");
+
         }
+
     };
 
     reader.readAsText(file);
+
 };
 
 
